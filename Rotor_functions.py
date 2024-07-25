@@ -36,7 +36,7 @@ cite()
 #Libaries
 import numpy as np
 from scipy.special import sph_harm
-import argparse
+import argparse, os, json
 
 # Number of Functions for Oh for a given ell and irrep
 symmetry_data = {
@@ -407,13 +407,21 @@ def finding_sym(sym,el,m):
         irrep : str
             irrep name
         ms : tuple, (int,)
-            tuple of real spherical harmonics that tranfsorm into this cubic harmonic. add el to get index of non-cubic symmetry adapted function
+            tuple of real spherical harmonics that tranfsorm into this cubic harmonic. ms_n + el is the index of non-cubic symmetry adapted function
         coefs: tuple, (float,)
             tuple of the coeffiecients of the real spherical harmonics that tranfsorm into this cubic harmonic
     num : int, 0 > num
         index of irrep for given el, 0 > num
 
-    If non-cubic point group
+
+    If non-cubic point group with non-degenerate irrep
+    ---
+    irrep : str
+        irrep name
+    num : int, 0 > num
+        index of irrep for given el, 0 > num
+
+    If non-cubic point group with degenerate irrep
     ---
     m_sym : tuple
         (irrep, m_1, m_2, ....)
@@ -920,7 +928,7 @@ def rotor_function(time_series,el,m,sym,time=True):
             ex. Br-MLWFC --> (4,2,t)
             ex. Sn-MLWFC --> (1,2,t)
             ex. Sn-Br --> (6,2,t)
-        2 : index 0 is phi, index 1 is theta as found in cart2sph()
+        2 : index 0 is theta, index 1 is phi as found in cart2sph()
         t : number of timesteps
     el : int, 0 >= el
         angular momentum quantum number
@@ -948,8 +956,8 @@ def rotor_function(time_series,el,m,sym,time=True):
     ... for b,cart_b in enumerate(cartesian):
     ...     x,y,z = cart_b.T
     ...     phi,theta = cart2sph(x,y,z)[1:]
-    ...     time_series[b,0] = phi
-    ...     time_series[b,1] = theta
+    ...     time_series[b,0] = theta
+    ...     time_series[b,1] = phi
     ... rot_time_series = rotor_function(time_series,3,3,'D4h')
     ... print(rot_time_series)
      [ 0.41871469, -0.41871469]
@@ -993,16 +1001,16 @@ def rotor_function(time_series,el,m,sym,time=True):
         n_coord,n,n_steps = time_series.shape
         rot_time_series = np.zeros(n_steps)
         for b in time_series:
-            phi,theta = b
+            theta,phi = b
             rot_time_series += calc_rotor(phi,theta)
     else:
-        phi,theta = time_series
+        theta,phi = time_series
         return calc_rotor(phi,theta)
     # Return average value over the objects
     return rot_time_series/n_coord
 
 # Find Coeffeicents for Laplace Series
-def laplace_coef(time_series,sym,el_cutoff,fluc=False):
+def laplace_coef(time_series,sym,el_cutoff=18,fluc=False):
     """
     Laplace Series coefficients of orientational distribution of time series
     The coefficients is the average value of symmetry adapted function and non-zero for partner functions to the fully symmetric representations
@@ -1073,7 +1081,9 @@ def laplace_coef(time_series,sym,el_cutoff,fluc=False):
 def main():
     parser = argparse.ArgumentParser(description="A script with two functions: add and subtract.")
     parser.add_argument('--h', type=str, choices=['cart2sph', 'finding_sym','rotor_function','laplace_coef'], help="Show help for the specified function.")
-
+    parser.add_argument('--f', type=str, choices=['cart2sph', 'finding_sym','rotor_function','laplace_coef'], help="Runs function with given text input file (--i [file]).")
+    parser.add_argument('--i', type=str, help="Input file.")
+    parser.add_argument('--o', type=str, help="Output file. Default is [input_file prefix]_[function].out")
     args = parser.parse_args()
 
     if args.h:
@@ -1086,7 +1096,71 @@ def main():
         elif args.h == "laplace_coef":
             help(laplace_coef)
     else:
-        print("Please provide the --h flag followed by the function name (add or subtract) to get help for the function.")
+        if args.f:
+            if args.i:
+                i_prefix = ((args.i).split("."))[0]
+                if args.o:
+                    o_file = args.o
+                else:
+                    o_file = f"{i_prefix}_{args.f}"
+                if args.f == "cart2sph":
+                    xyz = np.loadtxt(args.i)
+                    x,y,z = xyz.T
+                    r,phi,theta = cart2sph(x,y,z)
+                    np.savetxt(f"{o_file}_phi.out",phi)
+                    np.savetxt(f"{o_file}_theta.out",theta)
+                elif args.f == "finding_sym":
+                    input = np.loadtxt(args.i,dtype = 'str')
+                    sym = input[0]
+                    el = int(input[1])
+                    m = int(input[2])
+                    sym_tuple = finding_sym(sym,el,m)
+                    if sym not in ('Oh','O','Td','Th','T'):
+                        if sym_tuple[0][0] in ('A','B'):
+                            print('Irrep:',sym_tuple[0])
+                            print('ith Irrep:',sym_tuple[1])
+                        else:
+                            print('Irrep:',sym_tuple[0][0])
+                            print('ith Irrep:',sym_tuple[1])
+                            print('Degenerate Real Spherical Functions (add el to get index for softwares notation):',sym_tuple[0][1:])
+                    else:
+
+                        print('Irrep:',sym_tuple[0][0])
+                        print('ith Irrep:',sym_tuple[1])
+                        print('Real Spherical Functions use in Cubic Harmonic Linear Combination (add el to get index for softwares notation):',sym_tuple[0][1][0])
+                        print('Coeffiecents of Real Spherical Functions use in Cubic Harmonic Linear Combination:',sym_tuple[0][1][1])
+                elif args.f == "rotor_function":
+                    theta_phi = np.load(args.i)
+                    if os.path.exists('sym.inp'):
+                        input = np.loadtxt('sym.inp',dtype = 'str')
+                        sym = input[0]
+                        el = int(input[1])
+                        m = int(input[2])
+                        sym_tuple = finding_sym(sym,el,m)
+                    else:
+                        raise FileNotFoundError('Symmetry file doesnt exist. Please supply sym.inp')
+                    rot = rotor_function(theta_phi,el,m,sym)
+                    np.savetxt(f"{o_file}.out",rot)
+                elif args.f == "laplace_coef":
+                    theta_phi = np.load(args.i)
+
+                    if os.path.exists('sym.inp'):
+                        input = np.loadtxt('sym.inp',dtype = 'str')
+                        sym = input[0]
+                        el = int(input[1])
+                        m = int(input[2])
+                        sym_tuple = finding_sym(sym,el,m)
+                    else:
+                        raise FileNotFoundError('Symmetry file doesnt exist. Please supply sym.inp')
+                    av,fluc = laplace_coef(theta_phi,sym)
+                    with open(f"{o_file}.out", 'w') as json_file:
+                        json.dump(av, json_file, indent=4)
+                else:
+                    print("Not a valid function. Valid functions are ['cart2sph', 'finding_sym','rotor_function','laplace_coef']. Use --h flag [function] for help.")
+            else:
+                print("No input file provided. Use --i flag to enter input file.")
+        else:
+            print("No function provided. Use --f [function] flag. Valid functions are ['cart2sph', 'finding_sym','rotor_function','laplace_coef']. Use --h flag [function] for help.")
 
 if __name__ == "__main__":
     main()
