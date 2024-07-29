@@ -1,23 +1,23 @@
 # Examples
 ## Files
-In the real simulation the number of Br is 192 with over 500000 timesteps.
+In the real simulation, the number of Br is 192 with over 500000 timesteps.
 The files here are truncated just to show examples
 
-All xyz files are Br-MLWFC (Maxiammly Localized Wannier Centers) vectors with the x,y,z components of the vectors being represented.
+All xyz files are Br-MLWFC (Maximally Localized Wannier Centers [[1]](#1)) vectors with the x,y,z components of the vectors being represented.
 One could get this data by reading in a trajectory file, finding the 4 closest MLWFCs near a given Br, and then find the distance vector between them while applying periodic boundary conditions.
 
-Br_#_MLWFC.npy files are 3D numpy file with shape (4,2,1000) with 4 being the number of MLWFC, 2 being theta and phi, and 1000 being the number of timesteps
+Br_#_MLWFC.npy files are 3D numpy files with shape (4,2,1000) with 4 being the number of MLWFC, 2 being theta and phi, and 1000 being the number of timesteps
 
-Brs_MLWFC.npy is a 4D numpy files with shape (2,4,2,1000) with 2, being number of Br, 4 being the number of MLWFC, 2 being theta and phi, and 1000 being the number of timesteps
+Brs_MLWFC.npy is a 4D numpy file with shape (2,4,2,1000) with 2, being the number of Br, 4 being the number of MLWFC, 2 being theta and phi, and 1000 being the number of timesteps
 
 sym.inp is the symmetry input file.
 The format is: 
-(point group in Schoenflies notation) (angular momentum quantum number) (index of symmetry adapted function for given el)
+(point group in Schoenflies notation) (angular momentum quantum number) (index of the symmetry adapted function for given el)
 
 sym_cubic.inp is an example of a cubic point group input file
 
 ## Example commands
-First move Rotor_functions.py to local directory
+First, move Rotor_functions.py to the local directory
 
 This outputs 2 outfiles which is the theta and phi values of the inputted vectors
 ```
@@ -41,3 +41,9 @@ This outputs a json dictionary with the Laplace series coefficients
 ```
 python3 Rotor_functions.py --f laplace_coef --i Brs_MLWFC.npy
 ```
+
+## References
+<a id="1">[1]</a> 
+Marzari, N.,  Mostofi, A. A.,  Yates, J. R.,  Souza, I., Vanderbilt, D., 
+Maximally localized Wannier functions: Theory and applications. 
+Reviews of Modern Physics 2012, 84 (4), 1419-1475.
