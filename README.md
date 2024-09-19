@@ -14,7 +14,7 @@ The help flag provides more detailed help for each function by running
 ```
 python3 Rotor_functions.py --h [function]
 ```
-Please cite [Colin M. Hylton-Farrington, R. C. R., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. arXiv 2024.](https://arxiv.org/abs/2404.11247)
+Please cite [Hylton-Farrington, C. M.; Remsing, R. C., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. Chemistry of Materials 2024.](https://pubs.acs.org/doi/10.1021/acs.chemmater.4c01121)
 
 ## Theory
 Rotor functions, $`\mathcal{M}_{\xi}^{\ell,m}`$, naturally arise in the expansion of the orientational distribution function,
