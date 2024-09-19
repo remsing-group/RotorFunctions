@@ -14,22 +14,25 @@ ______      _
 \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 
 """)
-    print('Please cite:https://arxiv.org/abs/2404.11247')
-    print('Colin M. Hylton-Farrington, R. C. R., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. arXiv 2024.')
+    print('Please cite:https://pubs.acs.org/doi/10.1021/acs.chemmater.4c01121')
+    print('Hylton-Farrington, C. M.; Remsing, R. C., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. Chemistry of Materials 2024.')
 cite()
 # If you use this code in your research or project, please cite the associated paper:
 #
-# Colin M. Hylton-Farrington, R. C. R., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. arXiv 2024.
+# Hylton-Farrington, C. M.; Remsing, R. C., Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites. Chemistry of Materials 2024.
 #
 #
 # ```bibtex
 # @article{hylton-farrington2024,
-#    author = {Colin M. Hylton-Farrington, Richard C. Remsing},
+#    author = {Hylton-Farrington, Colin M. and Remsing, Richard C.},
 #    title = {Dynamic Local Symmetry Fluctuations of Electron Density in Halide Perovskites},
-#    journal = {arXiv},
-#    DOI = {doi.org/10.48550/arXiv.2404.11247},
+#    journal = {Chemistry of Materials},
+#    ISSN = {0897-4756
+# 1520-5002},
+#    DOI = {10.1021/acs.chemmater.4c01121},
+#    url = {https://pubs.acs.org/doi/pdf/10.1021/acs.chemmater.4c01121},
 #    year = {2024},
-#    type = {arXiv}
+#    type = {Journal Article}
 # }
 
 
